@@ -17,7 +17,6 @@ start-all.bat
 ### 2. 访问系统
 - **前端**: http://localhost:3000
 - **管理后台**: http://localhost:3000/admin
-- **默认管理员**: admin@example.com / admin123
 
 ## 🎯 核心功能
 
