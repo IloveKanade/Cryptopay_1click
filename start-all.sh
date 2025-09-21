@@ -62,7 +62,7 @@ echo "========================================"
 echo ""
 echo "[服务地址]"
 echo "Epusdt管理后台: http://localhost:8000"
-echo "Payment Link前端: http://localhost:3000"
+echo "Payment Link前端: http://localhost:3001"
 echo "Payment Link后端API: http://localhost:8080"
 echo ""
 echo "[数据库]"
@@ -77,24 +77,24 @@ echo ""
 # 检查系统类型并打开浏览器
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS
-    open http://localhost:3000
+    open http://localhost:3001
     open http://localhost:8000
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # Linux
     if command -v xdg-open &> /dev/null; then
-        xdg-open http://localhost:3000
+        xdg-open http://localhost:3001
         xdg-open http://localhost:8000
     elif command -v gnome-open &> /dev/null; then
-        gnome-open http://localhost:3000
+        gnome-open http://localhost:3001
         gnome-open http://localhost:8000
     else
         echo "请手动打开浏览器访问:"
-        echo "  - http://localhost:3000"
+        echo "  - http://localhost:3001"
         echo "  - http://localhost:8000"
     fi
 else
     echo "请手动打开浏览器访问:"
-    echo "  - http://localhost:3000"
+    echo "  - http://localhost:3001"
     echo "  - http://localhost:8000"
 fi
 

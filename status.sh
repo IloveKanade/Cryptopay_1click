@@ -35,7 +35,7 @@ docker network ls | grep payment
 echo ""
 
 echo "[端口占用情况]"
-netstat -tuln | grep ":3000" || echo "端口3000未占用"
+netstat -tuln | grep ":3001" || echo "端口3001未占用"
 netstat -tuln | grep ":8000" || echo "端口8000未占用"
 netstat -tuln | grep ":8080" || echo "端口8080未占用"
 netstat -tuln | grep ":3306" || echo "端口3306未占用"
@@ -47,7 +47,7 @@ echo "检查Epusdt管理后台..."
 curl -s -o /dev/null -w "HTTP状态码: %{http_code}\n" http://localhost:8000 || echo "无法连接到Epusdt管理后台"
 
 echo "检查Payment Link前端..."
-curl -s -o /dev/null -w "HTTP状态码: %{http_code}\n" http://localhost:3000 || echo "无法连接到Payment Link前端"
+curl -s -o /dev/null -w "HTTP状态码: %{http_code}\n" http://localhost:3001 || echo "无法连接到Payment Link前端"
 
 echo "检查Payment Link后端API..."
 curl -s -o /dev/null -w "HTTP状态码: %{http_code}\n" http://localhost:8080/api/health || echo "无法连接到Payment Link后端API"

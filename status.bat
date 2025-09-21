@@ -36,7 +36,7 @@ docker network ls | findstr payment
 echo.
 
 echo [端口占用情况]
-netstat -an | findstr ":3000"
+netstat -an | findstr ":3001"
 netstat -an | findstr ":8000"
 netstat -an | findstr ":8080"
 netstat -an | findstr ":3306"
@@ -48,7 +48,7 @@ echo 检查Epusdt管理后台...
 curl -s -o nul -w "HTTP状态码: %%{http_code}\n" http://localhost:8000 || echo "无法连接到Epusdt管理后台"
 
 echo 检查Payment Link前端...
-curl -s -o nul -w "HTTP状态码: %%{http_code}\n" http://localhost:3000 || echo "无法连接到Payment Link前端"
+curl -s -o nul -w "HTTP状态码: %%{http_code}\n" http://localhost:3001 || echo "无法连接到Payment Link前端"
 
 echo 检查Payment Link后端API...
 curl -s -o nul -w "HTTP状态码: %%{http_code}\n" http://localhost:8080/api/health || echo "无法连接到Payment Link后端API"

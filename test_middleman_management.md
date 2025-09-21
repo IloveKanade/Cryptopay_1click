@@ -21,7 +21,7 @@
 
 3. **访问中间人钱包管理**:
    - 方式1: 在管理后台点击"中间人钱包"导航
-   - 方式2: 直接访问 http://localhost:3000/admin/middleman
+   - 方式2: 直接访问 http://localhost:3001/admin/middleman
 
 ## 📋 功能测试
 

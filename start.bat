@@ -79,7 +79,7 @@ echo RUN npm run build >> Dockerfile
 echo FROM nginx:alpine >> Dockerfile
 echo COPY --from=builder /app/build /usr/share/nginx/html >> Dockerfile
 echo COPY nginx.conf /etc/nginx/nginx.conf >> Dockerfile
-echo EXPOSE 3000 >> Dockerfile
+echo EXPOSE 3001 >> Dockerfile
 echo CMD ["nginx", "-g", "daemon off;"] >> Dockerfile
 cd ..\..
 
@@ -94,7 +94,7 @@ if %errorlevel% equ 0 (
     echo ========================================
     echo.
     echo 服务访问地址:
-    echo    - 前端界面: http://localhost:3000
+    echo    - 前端界面: http://localhost:3001
     echo    - 后端API:  http://localhost:8080
     echo    - Epusdt管理: http://localhost:8000
     echo.
@@ -104,7 +104,7 @@ if %errorlevel% equ 0 (
     
     set /p open_browser="是否打开浏览器访问系统? (y/n): "
     if /i "%open_browser%"=="y" (
-        start http://localhost:3000
+        start http://localhost:3001
         timeout /t 2 /nobreak >nul
         start http://localhost:8000
     )

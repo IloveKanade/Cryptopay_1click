@@ -50,7 +50,7 @@ func main() {
 	// 初始化支付服务配置
 	paymentConfig := &service.Config{
 		BaseURL:     "http://localhost:" + cfg.Server.Port,
-		FrontendURL: "http://localhost:3000",
+		FrontendURL: "http://localhost:3001",
 	}
 	paymentService := service.NewPaymentService(db, epusdtService, middlemanWalletService, paymentConfig)
 
