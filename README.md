@@ -11,87 +11,93 @@
 - **易于集成**: 提供完整的API接口和SDK，快速集成到现有系统
 - **多场景支持**: 适用于电商、数字商品销售、服务付费等多种业务场景
 
-## 快速启动指南
+## 📚 相关文档
 
-### 环境准备
+- **[系统说明文档](./系统说明文档.md)** - 详细的技术实现文档
+  - [技术架构详解](./系统说明文档.md#技术架构详解)
+  - [API接口文档](./系统说明文档.md#api接口文档)
+  - [部署配置详解](./系统说明文档.md#部署配置详解)
+  - [测试与质量保证](./系统说明文档.md#测试与质量保证)
+  - [故障排除与运维](./系统说明文档.md#故障排除与运维)
 
-#### 系统要求
-- **操作系统**: Linux/macOS/Windows
-- **Docker**: 20.10+ 
-- **Docker Compose**: 1.29+
-- **Git**: 2.0+
-- **可用端口**: 3001, 8000, 8080, 8081, 3306, 6379
+## 快速部署指南
 
-#### 端口说明
-| 端口 | 服务 | 说明 |
-|------|------|------|
-| 3001 | 前端界面 | React应用主界面 |
-| 8000 | Epusdt管理 | USDT支付网关管理后台 |
-| 8080 | 后端API | RESTful API服务 |
-| 8081 | 数据库管理 | phpMyAdmin数据库管理界面 |
-| 3306 | MySQL | 数据库服务 |
-| 6379 | Redis | 缓存和会话存储 |
+### 环境要求
+- **操作系统**: Linux/Windows (支持x86/ARM架构)
+- **数据库**: MySQL 5.7+ 或 MariaDB 10.3+
+- **缓存**: Redis 5.0+ (可选，用于Payment Link MVP)
+- **Go版本**: 1.19+ (仅开发环境需要)
 
-### 一键部署（推荐）
+### 一键部署 (推荐)
 
+#### 使用宝塔面板部署
+1. 安装宝塔面板并配置MySQL
+2. 下载Epusdt二进制文件
+3. 按照 [宝塔部署教程](epusdt/wiki/BT_RUN.md) 进行配置
+4. 启动服务并测试API连通性
+
+#### 使用Docker部署
 ```bash
-# 1. 克隆项目
-git clone https://github.com/WFHTask/Test_Tasks.git
+# 克隆项目
+git clone [项目地址]
 cd Test_Tasks
 
-# 2. 检查端口占用（可选）
-netstat -tulpn | grep -E ':(3001|8000|8080|8081|3306|6379)'
-
-# 3. 启动所有服务
+# 启动Payment Link MVP
+cd payment-link-mvp
 docker-compose up -d
 
-# 4. 等待服务启动完成（约2-3分钟）
-docker-compose ps
-
-# 5. 查看服务状态
-./status.sh
+# 启动Epusdt (需要先配置数据库)
+cd ../epusdt
+./epusdt
 ```
 
-### 分步部署
+### 配置说明
 
-如果需要更精细的控制，可以分步启动服务：
+#### Epusdt配置
+```yaml
+# config.yml 主要配置项
+database:
+  host: localhost
+  port: 3306
+  username: epusdt
+  password: epusdt123456
+  database: epusdt
 
+tron:
+  api_key: "your_tron_api_key"
+  
+telegram:
+  bot_token: "your_bot_token"  # 可选
+```
+
+#### Payment Link MVP配置
 ```bash
-# 1. 启动基础服务（数据库和缓存）
-docker-compose up -d mysql redis
-
-# 2. 等待数据库初始化完成（约30秒）
-docker-compose logs mysql | grep "ready for connections"
-
-# 3. 启动应用服务
-docker-compose up -d epusdt backend
-
-# 4. 启动前端服务
-docker-compose up -d frontend
+# 后端环境变量
+export DB_HOST=localhost
+export DB_PORT=3306
+export DB_USER=root
+export DB_PASSWORD=your_password
+export REDIS_URL=redis://localhost:6379
 ```
 
 ### 验证部署
 
-部署完成后，通过以下步骤验证系统是否正常运行：
+1. **Epusdt API测试**:
+   ```bash
+   curl http://localhost:8080/api/v1/health
+   ```
 
-1. **访问前端界面**: http://localhost:3001
-2. **访问Epusdt管理后台**: http://localhost:8000
-3. **测试API接口**: http://localhost:8080/api/health
-4. **访问数据库管理**: http://localhost:8081
+2. **Payment Link访问**:
+   - 前端: http://localhost:3000
+   - 后端API: http://localhost:8081
 
-### 初始配置
+3. **数据库连接测试**:
+   - 检查数据表是否正确创建
+   - 验证示例数据是否导入成功
 
-#### Epusdt配置
-1. 首次访问 http://localhost:8000 时需要设置管理员账户
-2. 配置USDT钱包地址和TRC20网络参数
-3. 设置Telegram机器人（可选）
+> 🔧 **详细配置说明**: 更多配置选项和故障排除，请参考 [系统说明文档.md](系统说明文档.md) 中的部署章节
 
-#### 数据库访问
-- **地址**: http://localhost:8081
-- **用户名**: root
-- **密码**: epusdt123456
-
-## 核心组件详解
+## 核心组件概览
 
 ### 1. Epusdt支付网关
 
@@ -99,110 +105,33 @@ docker-compose up -d frontend
 <img src="epusdt/wiki/img/usdtlogo.png" width="200">
 </p>
 
-#### 组件简介
-Epusdt（Easy Payment Usdt）是一个由Go语言编写的私有化USDT支付中间件，支持TRC20网络。它为开发者提供了完整的数字货币支付解决方案，无需复杂配置即可实现USDT在线支付和消息回调功能。
+**Epusdt**（Easy Payment Usdt）是一个Go语言编写的私有化USDT支付中间件，支持TRC20网络，提供完整的数字货币支付解决方案。
 
-#### 核心特性
-- **私有化部署**: 完全自主控制，无需担心钱包被篡改和资金安全
-- **跨平台支持**: 支持x86和ARM架构的Windows/Linux设备
-- **高并发处理**: 多钱包地址轮询，支持高并发订单处理
-- **异步队列**: 优雅的异步响应机制，确保高性能
-- **零依赖部署**: 仅需一个二进制文件即可运行
-- **完整API**: 提供RESTful API，支持任何系统集成
-- **Telegram集成**: 支持机器人通知，实时支付消息推送
+**核心特性**:
+- 🏠 **私有化部署** - 完全自主控制，资金安全
+- 🚀 **高性能处理** - 支持高并发订单和异步队列
+- 🔌 **零依赖部署** - 仅需一个二进制文件即可运行
+- 📡 **完整API** - RESTful接口，支持任何系统集成
+- 📱 **Telegram集成** - 实时支付消息推送
 
-#### 技术架构
-```
-Epusdt架构
-├── plugins/          # 插件系统（如独角数卡集成）
-├── src/             # 核心源代码
-│   ├── controller/  # API控制器
-│   ├── model/       # 数据模型
-│   ├── middleware/  # 中间件
-│   ├── route/       # 路由配置
-│   └── util/        # 工具函数
-├── sql/             # 数据库脚本
-└── wiki/            # 文档和教程
-```
-
-#### 工作原理
-Epusdt通过监听TRC20网络API或节点，实时监控钱包地址的USDT入账事件。系统通过金额差异和时效性来判定交易归属，确保支付的准确性和安全性。
-
-**支付流程**:
-1. 客户发起支付请求（如20.05 USDT）
-2. 系统分配可用钱包地址和精确金额
-3. 客户按指定金额转账到指定地址
-4. 系统监听到入账后自动确认支付
-5. 触发回调通知商户系统
-
-#### 集成指南
-- **宝塔部署教程**: [epusdt/wiki/BT_RUN.md](epusdt/wiki/BT_RUN.md)
-- **开发者API文档**: [epusdt/wiki/API.md](epusdt/wiki/API.md)
-- **插件开发指南**: [epusdt/plugins/](epusdt/plugins/)
+**快速集成**:
+- 宝塔部署教程: [epusdt/wiki/BT_RUN.md](epusdt/wiki/BT_RUN.md)
+- API文档: [epusdt/wiki/API.md](epusdt/wiki/API.md)
+- 插件开发: [epusdt/plugins/](epusdt/plugins/)
 
 ### 2. Payment Link MVP系统
 
-#### 组件简介
-Payment Link MVP是一个基于React + Material-UI + Gin的现代化支付链接管理平台，为用户提供直观的支付链接创建和管理功能。
+**Payment Link MVP** 是基于React + Gin的现代化支付链接管理平台，提供直观的支付链接创建和管理功能。
 
-#### 功能特性
-- ✅ **访客落地页**: 精美的产品展示页面
-- ✅ **用户系统**: 完整的注册、登录、权限管理
-- ✅ **支付链接管理**: 创建、编辑、删除支付链接
-- ✅ **公开支付页面**: 客户友好的支付界面
-- ✅ **响应式设计**: 完美适配桌面和移动设备
-- ✅ **订单管理**: 实时订单状态跟踪
-- ✅ **数据统计**: 支付数据分析和报表
+**主要功能**:
+- ✅ 访客落地页和用户系统
+- ✅ 支付链接管理和公开支付页面
+- ✅ 响应式设计，完美适配移动设备
+- ✅ 实时订单跟踪和数据统计
 
-#### 技术栈
-**前端技术**:
-- React 18 - 现代化前端框架
-- Material-UI - Google Material Design组件库
-- TypeScript - 类型安全的JavaScript
-- Axios - HTTP客户端
-- React Router - 单页应用路由
+**技术栈**: React 18 + TypeScript + Material-UI + Gin + MySQL + Redis
 
-**后端技术**:
-- Gin - 高性能Go Web框架
-- GORM - Go语言ORM框架
-- JWT - JSON Web Token身份认证
-- MySQL - 关系型数据库
-- Redis - 缓存和会话存储
-
-#### 项目结构
-```
-payment-link-mvp/
-├── frontend/              # React前端应用
-│   ├── src/
-│   │   ├── components/    # React组件
-│   │   ├── pages/         # 页面组件
-│   │   ├── services/      # API服务
-│   │   └── utils/         # 工具函数
-│   ├── public/            # 静态资源
-│   └── package.json       # 依赖配置
-├── backend/               # Gin后端服务
-│   ├── internal/
-│   │   ├── handlers/      # HTTP处理器
-│   │   ├── models/        # 数据模型
-│   │   ├── services/      # 业务逻辑
-│   │   └── middleware/    # 中间件
-│   ├── migrations/        # 数据库迁移
-│   └── main.go           # 应用入口
-└── docker-compose.yml     # Docker配置
-```
-
-#### 开发环境搭建
-```bash
-# 后端开发
-cd payment-link-mvp/backend
-go mod tidy
-go run main.go
-
-# 前端开发
-cd payment-link-mvp/frontend
-npm install
-npm start
-```
+> 📖 **详细技术文档**: 如需了解深度技术实现、API接口详情、中间人钱包机制等，请参考 [系统说明文档.md](系统说明文档.md)
 
 ### 3. 插件生态系统
 
@@ -333,103 +262,93 @@ git submodule update --remote
 - 使用缓存预热策略
 - 监控缓存命中率
 
-## API接口文档
+## API接口概览
 
-### 核心API端点
+### Epusdt支付API
 
-#### Epusdt支付API
+**基础信息**:
+- **Base URL**: `http://localhost:8080/api/v1`
+- **认证方式**: API Key (Header: `X-API-Key`)
+- **数据格式**: JSON
+
+**核心接口**:
 ```bash
 # 创建支付订单
-POST /api/v1/order/create-transaction
-Content-Type: application/json
-
+POST /order
 {
-  "amount": "20.05",
-  "order_id": "ORDER_123456",
+  "amount": 10.5,
   "callback_url": "https://your-site.com/callback"
 }
+
+# 查询订单状态
+GET /order/{order_id}
+
+# 获取钱包余额
+GET /wallet/balance
 ```
 
-#### Payment Link API
+### Payment Link API
+
+**基础信息**:
+- **Base URL**: `http://localhost:8081/api`
+- **认证方式**: JWT Token
+- **数据格式**: JSON
+
+**核心接口**:
 ```bash
-# 创建支付链接
-POST /api/v1/payment-links
-Authorization: Bearer <token>
+# 用户登录
+POST /auth/login
 
-{
-  "title": "商品名称",
-  "amount": "100.00",
-  "description": "商品描述"
-}
+# 创建支付链接
+POST /payment-links
+
+# 获取支付链接列表
+GET /payment-links
 ```
 
-详细API文档请参考: [API接口文档.md](API接口文档.md)
+> 📚 **完整API文档**: 详细的接口参数、响应格式和错误码说明，请参考 [系统说明文档.md](系统说明文档.md) 中的API章节
 
 ## 安全考虑
 
-### 部署安全
-- 使用HTTPS协议部署生产环境
-- 定期更新系统和依赖包
-- 配置防火墙规则，仅开放必要端口
-- 使用强密码和定期更换
+### 核心安全措施
+- 🔐 **私钥安全**: 钱包私钥本地存储，不上传云端
+- 🛡️ **API认证**: 所有接口均需API Key验证
+- 🔒 **HTTPS传输**: 生产环境强制使用HTTPS
+- 📝 **签名验证**: 回调数据使用HMAC-SHA256签名
+- ⏰ **订单时效**: 支付订单自动过期机制
 
-### 数据安全
-- 定期备份数据库
-- 加密敏感配置信息
-- 实施访问控制和权限管理
-- 监控异常访问行为
+### 最佳实践
+- 定期更换API密钥
+- 监控异常交易和API调用
+- 备份钱包和数据库
+- 使用防火墙限制访问
 
-### 钱包安全
-- 使用冷钱包存储大额资金
-- 定期轮换热钱包地址
-- 设置合理的单笔和日限额
-- 启用多重签名验证
+> 🔒 **详细安全指南**: 完整的安全配置和风险防范措施，请参考 [系统说明文档.md](系统说明文档.md) 中的安全章节
 
 ## 技术支持与社区
 
-### 官方资源
-- **项目仓库**: https://github.com/WFHTask/Test_Tasks
-- **问题反馈**: GitHub Issues
-- **更新日志**: GitHub Releases
+### 获取帮助
+- 📖 **文档中心**: [系统说明文档.md](系统说明文档.md)
+- 🐛 **问题反馈**: GitHub Issues
+- 💬 **社区讨论**: 开发者交流群
+- 📧 **技术支持**: support@example.com
 
-### Epusdt社区
-- **Telegram频道**: https://t.me/epusdt
-- **交流群组**: https://t.me/epusdt_group
-- **官方文档**: [epusdt/wiki/](epusdt/wiki/)
-
-### 开发者支持
-- 提供完整的API文档和SDK
-- 支持多种编程语言集成
-- 提供示例代码和最佳实践
-- 活跃的开发者社区支持
+### 贡献指南
+欢迎提交Pull Request和Issue，共同完善项目。
 
 ## 版本信息
 
-### 当前版本
-- **Epusdt**: v0.0.2
-- **Payment Link MVP**: v1.0.0
-- **整体项目**: v1.0.0
-
-### 版本管理策略
-项目采用本地版本管理，避免远程仓库依赖风险，确保部署的稳定性和可控性。
+**当前版本**: v1.0.0  
+**更新日期**: 2024-01-01  
+**兼容性**: 支持TRC20网络，兼容主流浏览器
 
 ## 许可证
 
-本项目遵循以下开源协议：
-- **Epusdt**: [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html)
-- **Payment Link MVP**: MIT License
-- **整体项目**: 遵循各组件相应协议
+本项目采用 MIT 许可证，详情请参阅 [LICENSE](LICENSE) 文件。
 
 ## 免责声明
 
-⚠️ **重要提醒**
-
-本项目仅供学习和技术交流使用，请遵守当地法律法规：
-
-1. **合规使用**: 请确保在您所在地区合法使用数字货币相关功能
-2. **风险自担**: 使用过程中产生的任何法律责任由用户自行承担
-3. **学习目的**: 项目中涉及的区块链代币均为学习用途
-4. **投资警示**: 不鼓励和支持任何投机性的数字货币交易行为
+本软件仅供学习和研究使用。使用本软件进行任何商业活动或处理真实资金时，请确保遵守当地法律法规。开发者不承担因使用本软件而产生的任何损失或法律责任。
 
 ---
 
